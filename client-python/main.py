@@ -3,7 +3,7 @@ import random
 ##########################################################
 
 main_intZeromq = 54361 # CHANGE THIS - OPTIONAL
-main_strName = "YOUR NAME" # CHANGE THIS - REQUIRED
+main_strName = "HairyChess" # CHANGE THIS - REQUIRED
 
 ##########################################################
 
