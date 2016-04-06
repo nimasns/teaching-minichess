@@ -44,46 +44,20 @@ def chess_boardSet(strIn):
 
     strIn = str(strIn)
     turnn, turnC, state[0:5], state[5:10], state[10:15], state[15:20], state[20:25], state[25:30] = list(strIn.split())
-
     turnN = int(turnn)
-
-    strOut = ''
-
-    strOut += str(turnN)
-    strOut += ' '
-    strOut += turnC
-    strOut += '\n'
-    strOut += ''.join(state[0:5]) + '\n'
-    strOut += ''.join(state[5:10]) + '\n'
-    strOut += ''.join(state[10:15]) + '\n'
-    strOut += ''.join(state[15:20]) + '\n'
-    strOut += ''.join(state[20:25]) + '\n'
-    strOut += ''.join(state[25:30]) + '\n'
-
-    return strOut
 
 
 def chess_winner():
     # determine the winner of the current state of the game and return '?' or '=' or 'W' or 'B' - note that we are returning a character and not a string
 
-    c = 0
-    w = ''
-
-    print turnN
-    if turnN > 40:
+    if not 'k' in state:
+        return 'W'
+    elif not 'K' in state:
+        return 'B'
+    elif turnN > 40:
         return '='
 
-    while c < 30:
-        if state[c] == 'k':
-            if w == 'W':
-                return '?'
-            w = 'B'
-        if state[c] == 'K':
-            if w == 'B':
-                return '?'
-            w = 'W'
-        c += 1
-    return w
+    return '?'
 
 
 def chess_isValid(intX, intY):
