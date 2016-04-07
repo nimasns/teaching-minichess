@@ -145,7 +145,61 @@ def chess_movesEvaluated():
 def chess_move(strIn):
     # perform the supplied move (for example 'a5-a4\n') and update the state of the game / your internal variables accordingly - note that it advised to do a sanity check of the supplied move
 
-    pass
+    global state
+    global turnC
+    global turnN
+    column = ['a', 'b', 'c', 'd', 'e']
+    c = 0
+
+    #separate the start and end position
+    start, end = list(strIn.split('-'))
+
+    #find the column for the start position
+    while column[c] != start[0]:
+        c += 1
+
+    #calculate the position in the array
+    position =29-(5*(int(start[1])-1)+ (4-c))
+
+    #Check to make sure '.' is not selected
+    if chess_isNothing(state[position]):
+        return False
+
+    #Check to make sure it is our own piece
+    #if str(state[position]).isupper() and turnC == 'B':
+     #   return False
+
+    if chess_isEnemy(str(state[position])):
+        return False
+
+    #save the value of the selected peice
+    piece = state[position]
+
+    #replace the start position with '.'
+    state[position] = '.'
+
+    # find the column for the end position
+    c = 0
+    while column[c] != end[0]:
+        c += 1
+
+    # calculate the position in the array
+    position =29-(5*(int(end[1])-1)+ (4-c))
+
+    #Check to see if replacement with queen is needed
+    if position < 5 and piece == 'P':
+        state[position] = 'Q'
+    elif position > 24 and piece == 'p':
+        state[position] = 'q'
+    else:
+        state[position] = piece
+
+    #change the turn number and turn color
+    if turnC == 'W':
+        turnC = 'B'
+    elif turnC == 'B':
+        turnC = 'W'
+        turnN += 1
 
 
 def chess_moveRandom():
