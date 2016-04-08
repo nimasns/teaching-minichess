@@ -110,8 +110,42 @@ def chess_isNothing(strPiece):
 
 def chess_eval():
     # with reference to the state of the game, return the the evaluation score of the side on move - note that positive means an advantage while negative means a disadvantage
+    piece = ['k', 'q', 'b', 'r', 'n', 'p']
+    n = 0
+    point = 0
+    a = 1
 
-    return 0
+    while n < 30:
+        if turnC == 'B':
+            a = -1
+        if state[n] == piece[5]:
+            point -= 10*a
+        elif state[n] == piece[5].upper():
+            point += 10*a
+        elif state[n] == piece[4]:
+            point -= 1000*a
+        elif state[n] == piece[4].upper():
+            point += 1000*a
+        elif state[n] == piece[3]:
+            point -= 500*a
+        elif state[n] == piece[3].upper():
+            point += 500*a
+        elif state[n] == piece[2]:
+            point -= 200*a
+        elif state[n] == piece[2].upper():
+            point += 200*a
+        elif state[n] == piece[1]:
+            point -= 50000*a
+        elif state[n] == piece[1].upper():
+            point += 50000*a
+        elif state[n] == piece[0]:
+            point -= 1000000*a
+        elif state[n] == piece[0].upper():
+            point += 1000000*a
+        n += 1
+
+    print point
+    return point
 
 
 def chess_moves():
@@ -121,12 +155,12 @@ def chess_moves():
     letters = ['a', 'b', 'c', 'd', 'e']
     n = 0
 
-    if turnC == 'W':
-        while n < 30:
-            if chess_isOwn(str(state[n])):
-                row = 7 - ((n - (n % 5)) / 4)
-                start = letters[n % 5] + str(row)
-                if state[n] == 'P':
+    while n < 30:
+        if chess_isOwn(str(state[n])):
+            row = 7 - ((n - (n % 5)) / 4)
+            start = letters[n % 5] + str(row)
+            if state[n] == 'P' or state[n] == 'p':
+                if turnC == 'W':
                     if chess_isNothing(str(state[n - 5])):
                         end = letters[n % 5] + str(row + 1)
                         strOut.append(start+'-'+end)
@@ -136,55 +170,21 @@ def chess_moves():
                     if chess_isEnemy(str(state[n - 6])):
                         end = letters[(n % 5) - 1] + str(row + 1)
                         strOut.append(start + '-' + end)
-                #elif state[n] == 'R':
-                    #strOut.append(start + '-' + end)
-
-                #elif state[n] == 'B':
-                    #strOut.append(start + '-' + end)
-
-                elif state[n] == 'N':
-                    if chess_isNothing(str(state[n])) or chess_isEnemy(str(state[n])):
-                        strOut.append(start + '-' + end)
-
-                #elif state[n] == 'Q':
-                    #strOut.append(start + '-' + end)
-
-                #elif state[n] == 'K':
-                    #strOut.append(start + '-' + end)
-
-            n += 1
-
-    elif turnC == 'B':
-        while n < 30:
-            if chess_isOwn(str(state[n])):
-                row = 7 - ((n - (n % 5)) / 4)
-                start = letters[n % 5] + str(row)
-                if state[n] == 'p':
-                    if chess_isNothing(str(state[n + 5])):
+                elif turnC == 'B':
+                    if chess_isNothing(str(state[n - 5])):
                         end = letters[n % 5] + str(row - 1)
                         strOut.append(start + '-' + end)
-                    if chess_isEnemy(str(state[n + 4])):
-                        end = letters[(n % 5) - 1] + str(row + 1)
+                    if chess_isEnemy(str(state[n - 4])):
+                        end = letters[(n % 5) - 1] + str(row - 1)
                         strOut.append(start + '-' + end)
-                    if chess_isEnemy(str(state[n + 6])):
-                        end = letters[(n % 5) + 1] + str(row + 1)
+                    if chess_isEnemy(str(state[n - 6])):
+                        end = letters[(n % 5) + 1] + str(row - 1)
                         strOut.append(start + '-' + end)
+            elif state[n] == 'r':
+                pass
 
-                #elif state[n] == 'r':
-                    #strOut.append(start + '-' + end)
 
-                #elif state[n] == 'b':
-                    #strOut.append(start + '-' + end)
-
-                #elif state[n] == 'n':
-                    #strOut.append(start + '-' + end)
-
-                #elif state[n] == 'q':
-                    #strOut.append(start + '-' + end)
-
-                #elif state[n] == 'k':
-                    #strOut.append(start + '-' + end)
-            n += 1
+        n += 1
 
     print strOut
 
@@ -235,8 +235,8 @@ def chess_move(strIn):
         return False
 
     #Check to make sure it is our own piece
-    #if str(state[position]).isupper() and turnC == 'B':
-     #   return False
+    if str(state[position]).isupper() and turnC == 'B':
+        return False
 
     if chess_isEnemy(str(state[position])):
         return False
