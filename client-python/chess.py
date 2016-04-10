@@ -158,31 +158,88 @@ def chess_moves():
     while n < 30:
         if chess_isOwn(str(state[n])):
             row = 7 - ((n - (n % 5)) / 4)
-            start = letters[n % 5] + str(row)
+            column = n % 5
+            start = letters[column] + str(row)
+            #possible moves for pawns
             if state[n] == 'P' or state[n] == 'p':
                 if turnC == 'W':
                     if chess_isNothing(str(state[n - 5])):
-                        end = letters[n % 5] + str(row + 1)
+                        end = letters[column] + str(row + 1)
                         strOut.append(start+'-'+end)
                     if chess_isEnemy(str(state[n - 4])):
-                        end = letters[(n % 5) + 1] + str(row + 1)
+                        end = letters[(column) + 1] + str(row + 1)
                         strOut.append(start + '-' + end)
                     if chess_isEnemy(str(state[n - 6])):
-                        end = letters[(n % 5) - 1] + str(row + 1)
+                        end = letters[(column) - 1] + str(row + 1)
                         strOut.append(start + '-' + end)
                 elif turnC == 'B':
                     if chess_isNothing(str(state[n - 5])):
-                        end = letters[n % 5] + str(row - 1)
+                        end = letters[column] + str(row - 1)
                         strOut.append(start + '-' + end)
                     if chess_isEnemy(str(state[n - 4])):
-                        end = letters[(n % 5) - 1] + str(row - 1)
+                        end = letters[(column) - 1] + str(row - 1)
                         strOut.append(start + '-' + end)
                     if chess_isEnemy(str(state[n - 6])):
-                        end = letters[(n % 5) + 1] + str(row - 1)
+                        end = letters[(column) + 1] + str(row - 1)
                         strOut.append(start + '-' + end)
-            elif state[n] == 'r':
-                pass
-
+            #possible moves for rook
+            elif state[n] == 'r' or state[n] == 'R':
+                #Move to right
+                a = column + 1
+                m = n + 1
+                while a < 5 and not chess_isOwn(str(state[m])):
+                    end = letters[a] + str(row)
+                    strOut.append(start + '-' + end)
+                    a += 1
+                    m += 1
+                #move to left
+                a = column - 1
+                m = n - 1
+                while a > -1 and not chess_isOwn(str(state[m])):
+                    end = letters[a] +str(row)
+                    strOut.append(start + '-' + end)
+                    m -= 1
+                    a -= 1
+                a = row + 1
+                m = n - 5
+                #move up
+                while a < 7 and not chess_isOwn(str(state[m])):
+                    end = letters[column] + str(a)
+                    strOut.append(start + '-' + end)
+                    if chess_isEnemy(str(state[m])):
+                        a = 7
+                    a += 1
+                    m -= 5
+                a = row - 1
+                m = n + 5
+                # move down
+                while a > 0 and not chess_isOwn(str(state[m])):
+                    end  = letters[column] + str(a)
+                    strOut.append(start + '-' + end)
+                    if chess_isEnemy(str(state[m])):
+                         a = 0
+                    a -= 1
+                    m += 5
+            #possible moves for knight
+            elif state[n] == 'N' or state[n] == 'n':
+                r = row
+                c = column
+                a = 0
+                m = n
+                # move up and down
+                while a < 2:
+                    if -1 < c < 5:
+                        #move up left and right
+                        if not chess_isOwn(str(state[m - 11])) and r + 2 < 7 and m > 11:
+                            end = letters[c - 1] + str(r + 2)
+                            strOut.append(start + '-' + end)
+                        #move down left and right
+                        if m < 21 and not chess_isOwn(str(state[m + 9])) and 0 < r - 2:
+                            end = letters[c - 1] + str(r - 2)
+                            strOut.append(start + '-' + end)
+                    a += 1
+                    c += 2
+                    m += 2
 
         n += 1
 
