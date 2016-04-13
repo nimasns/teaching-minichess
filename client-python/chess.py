@@ -225,29 +225,26 @@ def chess_moves():
             #possible moves for knight
             elif state[n] == 'N' or state[n] == 'n':
                 r = row
-                c = column
                 a = 0
                 m = n
                 while a < 2:
-                    if -1 < c < 5:
-                        #move up left and right
-                        if not chess_isOwn(str(state[m - 11])) and r + 2 < 7 and m > 11:
-                            end = letters[c - 1] + str(r + 2)
-                            strOut.append(start + '-' + end + '\n')
-                        #move down left and right
-                        if m < 21 and not chess_isOwn(str(state[m + 9])) and 0 < r - 2:
-                            end = letters[c - 1] + str(r - 2)
-                            strOut.append(start + '-' + end + '\n')
-                        #move left and right up
-                        if m < 10 and not chess_isOwn(str(state[m - (7 - (a * 4))])) and r + 1 < 7:
-                            end = letters[c - (2 + (a * 2))] + str(r + 1)
-                            strOut.append(start + '-' + end + '\n')
-                        #move left and right down
-                        if m < 10 and not chess_isOwn(str(state[m + (3 + (a * 4))])) and 0 < r - 1:
-                            end = letters[c - (2 + (a * 2))] + str(r - 1)
-                            strOut.append(start + '-' + end + '\n')
+                    #move up left and right
+                    if not chess_isOwn(state[m - 11]) and r + 2 < 7 and -1 < column - 1 + (a * 2) < 5:
+                        end = letters[column - 1 + (a * 2)] + str(r + 2)
+                        strOut.append(start + '-' + end + '\n')
+                    #move down left and right
+                    if m < 16 and not chess_isOwn(state[m + 9]) and 0 < r - 2 and -1 < column - 1 + (a * 2) < 5:
+                        end = letters[column - 1 + + (a * 2)] + str(r - 2)
+                        strOut.append(start + '-' + end + '\n')
+                    #move left and right up
+                    if not chess_isOwn(state[n - 7 + (a * 4)]) and r + 1 < 7 and -1 < column - 2 + (a * 4) < 5:
+                        end = letters[column - 2 + (a * 4)] + str(r + 1)
+                        strOut.append(start + '-' + end + '\n')
+                    #move left and right down
+                    if not chess_isOwn(state[n - 7 + (a * 4)]) and 0 < r - 1 and -1 < column - 2 + (a * 4) < 5:
+                        end = letters[column - 2 + (a * 4)] + str(r - 1)
+                        strOut.append(start + '-' + end + '\n')
                     a += 1
-                    c += 2
                     m += 2
 
             #possible moves for king
@@ -256,7 +253,7 @@ def chess_moves():
                 while a < 2:
                     # move left up and down
                     if column - 1 > -1 and 0 < row + a < 7 and not chess_isOwn(state[n - 1 - (a * 5)]):
-                        end = letters[column - 1] + str(row - a)
+                        end = letters[column - 1] + str(row + a)
                         strOut.append(start + '-' + end + '\n')
                     #move right up and down
                     if column + 1 < 5 and 0 < row + a < 7 and not chess_isOwn(state[n + 1 - (a * 5)]):
@@ -274,19 +271,19 @@ def chess_moves():
                 while a < 2:
                     # move left up and down
                     if column - 1 > -1 and 0 < row + a < 7 and not chess_isOwn(state[n - 1 - (a * 5)]):
-                        end = letters[column - 1] + str(row - a)
+                        end = letters[column - 1] + str(row + a)
                         strOut.append(start + '-' + end + '\n')
                         # move cross
-                        if not a == 0 and column - 2 and chess_isNothing(state[n - 1 - (a * 5)]) and 0 < row + (a * 2) < 7 and chess_isOwn(state[n - 2 - (a * 10)]):
-                            end = letters[column + 2] + str(row + (a * (-2)))
+                        if not a == 0 and -1 < column - 2 and chess_isNothing(state[n - 1 - (a * 5)]) and 0 < row + (a * 2) < 7 and not chess_isOwn(state[n - 2 - (a * 10)]):
+                            end = letters[column - 2] + str(row + (a * 2))
                             strOut.append(start + '-' + end + '\n')
                     # move right up and down
                     if column + 1 < 5 and 0 < row + a < 7 and not chess_isOwn(state[n + 1 - (a * 5)]):
                         end = letters[column + 1] + str(row + a)
                         strOut.append(start + '-' + end + '\n')
                         #move cross
-                        if not a == 0 and chess_isNothing(state[n + 1 - (a * 5)]) and column + 2 < 5 and 0 < row - (a * 2) < 7 and chess_isOwn(state[n + 2 - (a * 10)]):
-                            end = letters[column + 2] + str(row + (a * (-2)))
+                        if not a == 0 and chess_isNothing(state[n + 1 - (a * 5)]) and column + 2 < 5 and 0 < row + (a * 2) < 7 and not chess_isOwn(state[n + 2 - (a * 10)]):
+                            end = letters[column + 2] + str(row + (a * 2))
                             strOut.append(start + '-' + end + '\n')
                     # move up and down
                     if 0 < row + a < 7 and not a == 0 and not chess_isOwn(state[n - (a * 5)]):
