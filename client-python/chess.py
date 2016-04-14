@@ -163,24 +163,24 @@ def chess_moves():
             #possible moves for pawns
             if state[n] == 'P' or state[n] == 'p':
                 if turnC == 'W':
-                    if chess_isNothing(str(state[n - 5])):
+                    if chess_isNothing(state[n - 5]):
                         end = letters[column] + str(row + 1)
                         strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[n - 4])):
-                        end = letters[(column) + 1] + str(row + 1)
+                    if chess_isEnemy(state[n - 4]) and (n - 4) % 5 == column + 1:
+                        end = letters[column + 1] + str(row + 1)
                         strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[n - 6])):
-                        end = letters[(column) - 1] + str(row + 1)
+                    if chess_isEnemy(state[n - 6]) and (n - 6) % 5 == column - 1:
+                        end = letters[column - 1] + str(row + 1)
                         strOut.append(start + '-' + end + '\n')
                 elif turnC == 'B':
-                    if chess_isNothing(str(state[n - 5])):
+                    if chess_isNothing(state[n + 5]):
                         end = letters[column] + str(row - 1)
                         strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[n - 4])):
-                        end = letters[(column) - 1] + str(row - 1)
+                    if chess_isEnemy(state[n + 4]) and (n + 4) % 5 == column - 1:
+                        end = letters[column - 1] + str(row - 1)
                         strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[n - 6])):
-                        end = letters[(column) + 1] + str(row - 1)
+                    if chess_isEnemy(state[n + 6]) and (n + 6) % 5 == column + 1:
+                        end = letters[column + 1] + str(row - 1)
                         strOut.append(start + '-' + end + '\n')
 
             #possible moves for rook
@@ -188,7 +188,7 @@ def chess_moves():
                 #Move to right
                 a = column + 1
                 m = n + 1
-                while a < 5 and not chess_isOwn(str(state[m])):
+                while a < 5 and not chess_isOwn(state[m]):
                     end = letters[a] + str(row)
                     strOut.append(start + '-' + end + '\n')
                     a += 1
@@ -196,7 +196,7 @@ def chess_moves():
                 #move to left
                 a = column - 1
                 m = n - 1
-                while a > -1 and not chess_isOwn(str(state[m])):
+                while a > -1 and not chess_isOwn(state[m]):
                     end = letters[a] +str(row)
                     strOut.append(start + '-' + end + '\n')
                     m -= 1
@@ -204,20 +204,20 @@ def chess_moves():
                 a = row + 1
                 m = n - 5
                 #move up
-                while a < 7 and not chess_isOwn(str(state[m])):
+                while a < 7 and not chess_isOwn(state[m]):
                     end = letters[column] + str(a)
                     strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[m])):
+                    if chess_isEnemy(state[m]):
                         a = 7
                     a += 1
                     m -= 5
                 a = row - 1
                 m = n + 5
                 # move down
-                while a > 0 and not chess_isOwn(str(state[m])):
+                while a > 0 and not chess_isOwn(state[m]):
                     end  = letters[column] + str(a)
                     strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[m])):
+                    if chess_isEnemy(state[m]):
                          a = 0
                     a -= 1
                     m += 5
@@ -241,8 +241,8 @@ def chess_moves():
                         end = letters[column - 2 + (a * 4)] + str(r + 1)
                         strOut.append(start + '-' + end + '\n')
                     #move left and right down
-                    if not chess_isOwn(state[n - 7 + (a * 4)]) and 0 < r - 1 and -1 < column - 2 + (a * 4) < 5:
-                        end = letters[column - 2 + (a * 4)] + str(r - 1)
+                    if n + 7 - (a * 4) < 30 and not chess_isOwn(state[n + 7 - (a * 4)]) and 0 < r - 1 and -1 < column + 2 - (a * 4) < 5:
+                        end = letters[column + 2 - (a * 4)] + str(r - 1)
                         strOut.append(start + '-' + end + '\n')
                     a += 1
                     m += 2
@@ -271,64 +271,89 @@ def chess_moves():
                 while a < 2:
                     # move left up and down
                     if column - 1 > -1 and 0 < row + a < 7 and not chess_isOwn(state[n - 1 - (a * 5)]):
-                        end = letters[column - 1] + str(row + a)
-                        strOut.append(start + '-' + end + '\n')
-                        # move cross
-                        if not a == 0 and -1 < column - 2 and chess_isNothing(state[n - 1 - (a * 5)]) and 0 < row + (a * 2) < 7 and not chess_isOwn(state[n - 2 - (a * 10)]):
-                            end = letters[column - 2] + str(row + (a * 2))
+                        if a == 0:
+                            if not chess_isEnemy(state[n - 1- (a * 5)]):
+                                end = letters[column - 1] + str(row + a)
+                                strOut.append(start + '-' + end + '\n')
+                        else:
+                            end = letters[column - 1] + str(row + a)
                             strOut.append(start + '-' + end + '\n')
+                        # move cross
+                        m = n - 2 - (a * 10)
+                        while not a == 0 and chess_isNothing(state[m + 1 + (a * 5)]) and -1 < m:
+                            if m % 5 < column and not chess_isOwn(state[m]):
+                                end = letters[m % 5] + str(6 - (m / 5))
+                                strOut.append(start + '-' + end + '\n')
+                            if chess_isEnemy(state[m]):
+                                m == 100
+                            m = m - 1 - (a * 5)
                     # move right up and down
                     if column + 1 < 5 and 0 < row + a < 7 and not chess_isOwn(state[n + 1 - (a * 5)]):
                         end = letters[column + 1] + str(row + a)
                         strOut.append(start + '-' + end + '\n')
                         #move cross
-                        if not a == 0 and chess_isNothing(state[n + 1 - (a * 5)]) and column + 2 < 5 and 0 < row + (a * 2) < 7 and not chess_isOwn(state[n + 2 - (a * 10)]):
-                            end = letters[column + 2] + str(row + (a * 2))
-                            strOut.append(start + '-' + end + '\n')
+                        m = n + 2 - (a * 10)
+                        while not a == 0 and chess_isNothing(state[m - 1 + (a * 5)]) and m < 30:
+                            if m % 5 > column and not chess_isOwn(state[m]):
+                                end = letters[m % 5] + str(6 - (m / 5))
+                                strOut.append(start + '-' + end + '\n')
+                            if chess_isEnemy(state[m]):
+                                m == 100
+                            m = m + 1 - (a * 5)
                     # move up and down
-                    if 0 < row + a < 7 and not a == 0 and not chess_isOwn(state[n - (a * 5)]):
+                    if 0 < row + a < 7 and not a == 0 and chess_isNothing(state[n - (a * 5)]):
                         end = letters[column] + str(row + a)
                         strOut.append(start + '-' + end + '\n')
                     a += 1
 
             # possible moves for Queen
-            elif state[n] == 'Q' or state[n] == 'Q':
+            elif state[n] == 'Q' or state[n] == 'q':
                 a = -1
-                while a < 2 and -1 < n + 1 - (a * 5) < 30:
+                while a < 2:
+                    # move left up and down
+                    if column - 1 > -1 and 0 < row + a  < 7 and not chess_isOwn(state[n - 1 - (a * 5)]):
+                        end = letters[column - 1] + str(row + a)
+                        strOut.append(start + '-' + end + '\n')
+                        # move cross
+                        m = n - 2 - (a * 10)
+                        while not a == 0 and chess_isNothing(state[m + 1 + (a * 5)]) and -1 < m:
+                            if m % 5 < column and not chess_isOwn(state[m]):
+                                end = letters[m % 5] + str(6 - (m / 5))
+                                strOut.append(start + '-' + end + '\n')
+                            if chess_isEnemy(state[m]):
+                                m == 100
+                            m = m - 1 - (a * 5)
                     # move right up and down
-                    if column + 1 < 5 and 0 < row + (a * (-1)) < 7 and not chess_isOwn(state[n + 1 - (a * 5)]):
+                    if n + 1 + (a * 5) < 30 and column + 1 < 5 and 0 < row + a < 7 and not chess_isOwn(state[n + 1 + (a * 5)]):
                         end = letters[column + 1] + str(row + (a * (-1)))
                         strOut.append(start + '-' + end + '\n')
                         #move cross
-                        if not a == 0 and chess_isNothing(state[n + 1 - (a * 5)]) and column + 2 < 5 and 0 < row + (a * (-2)) < 7 and chess_isOwn(state[n + 2 - (a * 10)]):
-                            end = letters[column + 2] + str(row + (a * (-2)))
-                            strOut.append(start + '-' + end + '\n')
-                    # move left up and down
-                    if column - 1 > -1 and 0 < row + (a * (-1)) < 7 and not chess_isOwn(state[n - 1 - (a * 5)]):
-                        end = letters[column - 1] + str(row - (a * (-1)))
-                        strOut.append(start + '-' + end + '\n')
-                        #move cross
-                        if not a == 0 and column - 2 and chess_isNothing(state[n - 1 - (a * 5)]) and 0 < row - (a * (-2)) < 7 and chess_isOwn(state[n - 2 - (a * 10)]):
-                            end = letters[column + 2] + str(row + (a * (-2)))
-                            strOut.append(start + '-' + end + '\n')
+                        m = n + 2 - (a * 10)
+                        while not a == 0 and chess_isNothing(state[m - 1 + (a * 5)]) and m < 30:
+                            if m % 5 > column and not chess_isOwn(state[m]):
+                                end = letters[m % 5] + str(6 - (m / 5))
+                                strOut.append(start + '-' + end + '\n')
+                            if chess_isEnemy(state[m]):
+                                m == 100
+                            m = m + 1 - (a * 5)
                     a += 1
                 a = row + 1
                 m = n - 5
                 # move up
-                while a < 7 and not chess_isOwn(str(state[m])):
+                while a < 7 and not chess_isOwn(state[m]):
                     end = letters[column] + str(a)
                     strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[m])):
+                    if chess_isEnemy(state[m]):
                         a = 7
                     a += 1
                     m -= 5
                 a = row - 1
                 m = n + 5
                 # move down
-                while a > 0 and not chess_isOwn(str(state[m])):
+                while a > 0 and not chess_isOwn(state[m]):
                     end = letters[column] + str(a)
                     strOut.append(start + '-' + end + '\n')
-                    if chess_isEnemy(str(state[m])):
+                    if chess_isEnemy(state[m]):
                         a = 0
                     a -= 1
                     m += 5
@@ -337,6 +362,9 @@ def chess_moves():
         n += 1
 
     print strOut
+    print '\n' + chess_boardGet()
+    print '\n'
+
     return strOut
 
 

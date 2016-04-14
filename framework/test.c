@@ -1751,7 +1751,7 @@ bool test_moves() {
 		return false;
 	}
 	
-	chess_boardSet("15 B\nk.bnr\n..N.p\nBp...\n.p.q.\nP..P.\n.R.K.\n");
+	chess_boardSet("15 B\nk.bnr\n..N.p\nBp...\n.p.q.\nP..P.\n.R...\n");
 	
 	intBuffer = chess_moves(charBuffer);
 	if (test_movesCompare(intBuffer, charBuffer, "a6-b6\na6-a5\na6-b5\nc6-b5\nc6-a4\nc6-d5\nc6-e4\nc6-b6\nd6-b5\nd6-c4\nd6-e4\ne5-e4\nb3-b2\nb3-a2\nd3-d4\nd3-d5\nd3-c3\nd3-e3\nd3-d2\nd3-c4\nd3-b5\nd3-e4\nd3-c2\nd3-b1\nd3-e2\n") != true) {
