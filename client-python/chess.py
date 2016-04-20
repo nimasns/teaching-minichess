@@ -5,7 +5,10 @@ import random
 state = []
 turnN = int
 turnC = ''
-
+mLog = []
+mPlog = []
+mlCounter = -1
+mlFlag = 0
 
 def chess_reset():
     # reset the state of the game / your internal variables - note that this function is highly dependent on your implementation
@@ -388,10 +391,6 @@ def chess_moves():
 
         n += 1
 
-    print strOut
-    print '\n' + chess_boardGet()
-    print '\n'
-
     return strOut
 
 
@@ -419,35 +418,40 @@ def chess_move(strIn):
     global state
     global turnC
     global turnN
+    global mlFlag
+    global mlCounter
+    global mLog
+    global mPlog
     column = ['a', 'b', 'c', 'd', 'e']
     c = 0
 
     #separate the start and end position
     start, end = list(strIn.split('-'))
 
+
     #find the column for the start position
     while column[c] != start[0]:
         c += 1
 
     #calculate the position in the array
-    position =29-(5*(int(start[1])-1)+ (4-c))
+    Oposition =29 - (5 * (int(start[1]) - 1) + (4 - c))
 
     #Check to make sure '.' is not selected
-    if chess_isNothing(state[position]):
+    if chess_isNothing(state[Oposition]):
         return False
 
     #Check to make sure it is our own piece
-    if str(state[position]).isupper() and turnC == 'B':
+    if str(state[Oposition]).isupper() and turnC == 'B' and mlFlag == 0:
         return False
 
-    if chess_isEnemy(str(state[position])):
+    if chess_isEnemy(str(state[Oposition])) and mlFlag == 0:
         return False
 
     #save the value of the selected peice
-    piece = state[position]
+    piece = state[Oposition]
 
     #replace the start position with '.'
-    state[position] = '.'
+    state[Oposition] = '.'
 
     # find the column for the end position
     c = 0
@@ -455,23 +459,43 @@ def chess_move(strIn):
         c += 1
 
     # calculate the position in the array
-    position =29-(5*(int(end[1])-1)+ (4-c))
+    position = 29 - (5 * (int(end[1]) - 1) + (4 - c))
 
-    #Check to see if replacement with queen is needed
-    if position < 5 and piece == 'P':
-        state[position] = 'Q'
-    elif position > 24 and piece == 'p':
-        state[position] = 'q'
+    if mlFlag == 0:
+        mLog.append(str(strIn))
+        mlCounter += 1
+        mPlog.append(str(state[position]))
+
+        #Check to see if replacement with queen is needed
+        if position < 5 and piece == 'P':
+            state[position] = 'Q'
+        elif position > 24 and piece == 'p':
+            state[position] = 'q'
+        else:
+            state[position] = piece
+
+        #change the turn number and turn color
+        if turnC == 'W':
+            turnC = 'B'
+        elif turnC == 'B':
+            turnC = 'W'
+            turnN += 1
     else:
+        # Check to see if replacement with queen is needed
         state[position] = piece
+        state[Oposition] = mPlog[mlCounter]
 
-    #change the turn number and turn color
-    if turnC == 'W':
-        turnC = 'B'
-    elif turnC == 'B':
-        turnC = 'W'
-        turnN += 1
+        # change the turn number and turn color
+        if turnC == 'W':
+            turnC = 'B'
+            turnN -= 1
+        elif turnC == 'B':
+            turnC = 'W'
 
+        mlFlag = 0
+        mLog.pop()
+        mPlog.pop()
+        mlCounter -= 1
 
 def chess_moveRandom():
     # perform a random move and return it - one example output is given below - note that you can call the chess_movesShuffled() function as well as the chess_move() function in here
@@ -499,5 +523,12 @@ def chess_moveAlphabeta(intDepth, intDuration):
 
 def chess_undo():
     # undo the last move and update the state of the game / your internal variables accordingly - note that you need to maintain an internal variable that keeps track of the previous history for this
+    global mlFlag
 
-    pass
+    if mlCounter > -1:
+        mlFlag = 1
+
+        start, end = list(mLog[mlCounter].split('-'))
+        strOut = end + '-' + start
+        chess_move(strOut)
+
