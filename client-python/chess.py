@@ -240,7 +240,7 @@ def chess_moves():
                         end = letters[column - 1 + (a * 2)] + str(r + 2)
                         strOut.append(start + '-' + end + '\n')
                     #move down left and right
-                    if m < 20 and not chess_isOwn(state[m + 9]) and 0 < r - 2 and -1 < column - 1 + (a * 2) < 5:
+                    if m < 21 and not chess_isOwn(state[m + 9]) and 0 < r - 2 and -1 < column - 1 + (a * 2) < 5:
                         end = letters[column - 1 + (a * 2)] + str(r - 2)
                         strOut.append(start + '-' + end + '\n')
                     #move left and right up
@@ -416,7 +416,7 @@ def chess_movesEvaluated():
     newlist = dict(zip(movelist, score))
     newlist = sorted(newlist, key=newlist.__getitem__)
     b = [newlist[0], ]
-    return b
+    return newlist
 
 def chess_move(strIn):
     # perform the supplied move (for example 'a5-a4\n') and update the state of the game / your internal variables accordingly - note that it advised to do a sanity check of the supplied move
@@ -530,6 +530,7 @@ def chess_undo():
     # undo the last move and update the state of the game / your internal variables accordingly - note that you need to maintain an internal variable that keeps track of the previous history for this
     global mlFlag
 
+    
     if mlCounter > -1:
         mlFlag = 1
 
