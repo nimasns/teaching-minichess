@@ -1,0 +1,41 @@
+def mergeSort(score, movelist):
+    #Merge Sort algorithm to the organize the score and coreseponding move
+    if len(score)>1:
+        mid = len(score)/2
+        midlist = len(movelist)/2
+        lefthalf = score[:mid]
+        Mlefthalf = movelist[:midlist]
+        righthalf = score[mid:]
+        Mrighthalf = movelist[midlist:]
+
+        mergeSort(lefthalf, Mlefthalf)
+        mergeSort(righthalf, Mrighthalf)
+
+        i=0
+        j=0
+        k=0
+
+        while i < len(lefthalf) and j < len(righthalf):
+            if lefthalf[i] < righthalf[j]:
+                score[k] = lefthalf[i]
+                movelist[k] = Mlefthalf[i]
+                i = i + 1
+            else:
+                score[k] = righthalf[j]
+                movelist[k] = Mrighthalf[j]
+                j = j + 1
+            k = k + 1
+
+        while i < len(lefthalf):
+            score[k] = lefthalf[i]
+            movelist[k] = Mlefthalf[i]
+            i = i + 1
+            k = k + 1
+
+        while j < len(righthalf):
+            score[k] = righthalf[j]
+            movelist[k] = Mrighthalf[j]
+            j = j + 1
+            k = k + 1
+
+    mergeSort(score, movelist)

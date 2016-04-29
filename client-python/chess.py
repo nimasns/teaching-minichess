@@ -396,21 +396,27 @@ def chess_moves():
 
 def chess_movesShuffled():
     # with reference to the state of the game, determine the possible moves and shuffle them before returning them- note that you can call the chess_moves() function in here
-
-    return []
+    movelist = chess_moves()
+    random.shuffle(movelist)
+    return movelist
 
 
 def chess_movesEvaluated():
-#<<<<<<< HEAD
     # with reference to the state of the game, determine the possible moves and sort them in order of an increasing evaluation score before returning them - note that you can call the chess_moves() function in here
+    movelist = chess_movesShuffled()
+    score = []
+    a = 0
 
-    return []
-#=======
-	# with reference to the state of the game, determine the possible moves and sort them in order of an increasing evaluation score before returning them - note that you can call the chess_movesShuffled() function in here
-	
-#	return []
-#>>>>>>> CodeRect/master
+    while len(movelist) != a:
+        chess_move(str(movelist[a]))
+        score.append(chess_eval())
+        chess_undo()
+        a += 1
 
+    newlist = dict(zip(movelist, score))
+    newlist = sorted(newlist, key=newlist.__getitem__)
+    b = [newlist[0], ]
+    return b
 
 def chess_move(strIn):
     # perform the supplied move (for example 'a5-a4\n') and update the state of the game / your internal variables accordingly - note that it advised to do a sanity check of the supplied move
@@ -427,7 +433,6 @@ def chess_move(strIn):
 
     #separate the start and end position
     start, end = list(strIn.split('-'))
-
 
     #find the column for the start position
     while column[c] != start[0]:
