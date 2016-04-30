@@ -150,29 +150,29 @@ def chess_eval():
         if turnC == 'B':
             a = -1
         if state[n] == piece[5]:
-            point -= 10*a
+            point -= 1*a
         elif state[n] == piece[5].upper():
-            point += 10*a
+            point += 1*a
         elif state[n] == piece[4]:
-            point -= 1000*a
+            point -= 3*a
         elif state[n] == piece[4].upper():
-            point += 1000*a
+            point += 3*a
         elif state[n] == piece[3]:
-            point -= 500*a
+            point -= 5*a
         elif state[n] == piece[3].upper():
-            point += 500*a
+            point += 5*a
         elif state[n] == piece[2]:
-            point -= 200*a
+            point -= 3*a
         elif state[n] == piece[2].upper():
-            point += 200*a
+            point += 3*a
         elif state[n] == piece[1]:
-            point -= 50000*a
+            point -= 9*a
         elif state[n] == piece[1].upper():
-            point += 50000*a
+            point += 9*a
         elif state[n] == piece[0]:
-            point -= 1000000*a
+            point -= 500*a
         elif state[n] == piece[0].upper():
-            point += 1000000*a
+            point += 500*a
         n += 1
 
     return point
@@ -431,19 +431,35 @@ def chess_movesShuffled():
 
 def chess_movesEvaluated():
     # with reference to the state of the game, determine the possible moves and sort them in order of an increasing evaluation score before returning them - note that you can call the chess_moves() function in here
+    print "NEW EVAL >>>>>>>"
+
     movelist = chess_movesShuffled()
     score = []
     a = 0
-
+    print len(movelist)
     while len(movelist) != a:
-        chess_move(str(movelist[a]))
+        chess_move(movelist[a])
         score.append(chess_eval())
         chess_undo()
         a += 1
 
+    print "Scores"
+    print score
+    print len(score)
+    print "move List"
+    print movelist
     newlist = dict(zip(movelist, score))
+    print len(newlist)
+    print "Newlist with Score"
+    print newlist
+    print len(newlist)
+    print "\n"
     newlist = sorted(newlist, key=newlist.__getitem__)
-    b = [newlist[0], ]
+    print "Ordered list"
+    print newlist
+    print len(newlist)
+    print "\n\n "
+
     return newlist
 
 def chess_move(strIn):
@@ -495,13 +511,10 @@ def chess_move(strIn):
     position = 29 - (5 * (int(end[1]) - 1) + (4 - c))
 
     if mlFlag == 0:
-        print "State of the game:"
-        print strIn
         mLog.append(str(strIn))
         mlCounter += 1
         mPlog.append(str(state[position]))
-        print "Move log"
-        print mLog
+
         #Check to see if replacement with queen is needed
         if position < 5 and piece == 'P':
             state[position] = 'Q'
@@ -541,21 +554,19 @@ def chess_move(strIn):
         mLog.pop()
         mPlog.pop()
         mlCounter -= 1
-        print mLog
-    print state
-    print turnC
-    print turnN
 
 def chess_moveRandom():
     # perform a random move and return it - one example output is given below - note that you can call the chess_movesShuffled() function as well as the chess_move() function in here
-
-    return 'c5-c4\n'
+    movelist = chess_movesShuffled()
+    chess_move(movelist[0])
+    return movelist[0]
 
 
 def chess_moveGreedy():
     # perform a greedy move and return it - one example output is given below - note that you can call the chess_movesEvaluated() function as well as the chess_move() function in here
-
-    return 'c5-c4\n'
+    movelist = chess_movesEvaluated()
+    chess_move(movelist[0])
+    return movelist[0]
 
 
 def chess_moveNegamax(intDepth, intDuration):
@@ -575,11 +586,9 @@ def chess_undo():
     global mlFlag
 
     if mlCounter > -1:
-        print "UNDO:"
         mlFlag = 1
 
         start, end = list(mLog[mlCounter].split('-'))
         end = end.strip('\n')
         strOut = end + '-' + start
-        print strOut
         chess_move(strOut)
