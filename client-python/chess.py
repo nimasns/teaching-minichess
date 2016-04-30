@@ -2,13 +2,22 @@ import random
 
 ##########################################################
 
+#board
 state = []
+#turn count
 turnN = int
+#turn color
 turnC = ''
+#move made array
 mLog = []
+#hit log
 mPlog = []
+#number of the moves made
 mlCounter = -1
+#Undo flag
 mlFlag = 0
+#p transition to q
+PtoQlog = []
 
 def chess_reset():
     # reset the state of the game / your internal variables - note that this function is highly dependent on your implementation
@@ -19,6 +28,16 @@ def chess_reset():
     turnC = 'W'
     global state
     state = list('kqbnrppppp..........PPPPPRNBQK')
+    global mLog
+    mLog = []
+    global mPlog
+    mPlog = []
+    global mlCounter
+    mlCounter = -1
+    global mlFlag
+    mlFlag = 0
+    global PtoQlog
+    PtoQlog = []
 
 def chess_boardGet():
     # return the state of the game - one example is given below - note that the state has exactly 40 or 41 characters
@@ -44,7 +63,16 @@ def chess_boardSet(strIn):
     global state
     global turnC
     global turnN
-
+    global mLog
+    global mPlog
+    global mlCounter
+    global mlFlag
+    global PtoQlog
+    mLog = []
+    mPlog = []
+    mlCounter = -1
+    mlFlag = 0
+    PtoQlog = []
     strIn = str(strIn)
     turnn, turnC, state[0:5], state[5:10], state[10:15], state[15:20], state[20:25], state[25:30] = list(strIn.split())
     turnN = int(turnn)
@@ -449,7 +477,7 @@ def chess_move(strIn):
     if str(state[Oposition]).isupper() and turnC == 'B' and mlFlag == 0:
         return False
 
-    if chess_isEnemy(str(state[Oposition])) and mlFlag == 0:
+    if chess_isEnemy(state[Oposition]) and mlFlag == 0:
         return False
 
     #save the value of the selected peice
@@ -467,14 +495,19 @@ def chess_move(strIn):
     position = 29 - (5 * (int(end[1]) - 1) + (4 - c))
 
     if mlFlag == 0:
+        print "State of the game:"
+        print strIn
         mLog.append(str(strIn))
         mlCounter += 1
         mPlog.append(str(state[position]))
-
+        print "Move log"
+        print mLog
         #Check to see if replacement with queen is needed
         if position < 5 and piece == 'P':
             state[position] = 'Q'
+            PtoQlog.append(mlCounter)
         elif position > 24 and piece == 'p':
+            PtoQlog.append(mlCounter)
             state[position] = 'q'
         else:
             state[position] = piece
@@ -490,6 +523,13 @@ def chess_move(strIn):
         state[position] = piece
         state[Oposition] = mPlog[mlCounter]
 
+        # Check to see if replacement with pawn is needed
+        if mlCounter in PtoQlog:
+            if piece.islower():
+                state[position] = 'p'
+            elif piece.isupper():
+                state[position] = 'P'
+
         # change the turn number and turn color
         if turnC == 'W':
             turnC = 'B'
@@ -501,6 +541,10 @@ def chess_move(strIn):
         mLog.pop()
         mPlog.pop()
         mlCounter -= 1
+        print mLog
+    print state
+    print turnC
+    print turnN
 
 def chess_moveRandom():
     # perform a random move and return it - one example output is given below - note that you can call the chess_movesShuffled() function as well as the chess_move() function in here
@@ -530,11 +574,12 @@ def chess_undo():
     # undo the last move and update the state of the game / your internal variables accordingly - note that you need to maintain an internal variable that keeps track of the previous history for this
     global mlFlag
 
-    
     if mlCounter > -1:
+        print "UNDO:"
         mlFlag = 1
 
         start, end = list(mLog[mlCounter].split('-'))
+        end = end.strip('\n')
         strOut = end + '-' + start
+        print strOut
         chess_move(strOut)
-
