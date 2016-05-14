@@ -568,9 +568,44 @@ def chess_moveGreedy():
 
 def chess_moveNegamax(intDepth, intDuration):
     # perform a negamax move and return it - one example output is given below - note that you can call the the other functions in here
+    best = ''
+    score = -999999
+    moves = chess_movesShuffled()
 
-    return 'c5-c4\n'
+    print state
 
+    if intDepth == 0:
+        return
+
+    for move in moves:
+        chess_move(move)
+        print move
+        temp = -chess_Negamax(intDepth - 1)
+        chess_undo()
+
+        if temp > score:
+            best = move
+            score = temp
+
+    chess_move(best)
+    return best
+
+def chess_Negamax(depth):
+    #Negamax function to assist chess_moveNegamax
+
+    moves = chess_movesShuffled()
+
+    if depth == 0 or chess_winner() != '?':
+        return chess_eval()
+
+    score = -999999
+
+    for move in moves:
+        chess_move(move)
+        score = max(score, -chess_Negamax(depth - 1))
+        chess_undo()
+
+    return score
 
 def chess_moveAlphabeta(intDepth, intDuration):
     # perform a alphabeta move and return it - one example output is given below - note that you can call the the other functions in here
