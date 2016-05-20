@@ -572,14 +572,11 @@ def chess_moveNegamax(intDepth, intDuration):
     score = -999999
     moves = chess_movesShuffled()
 
-    print state
-
     if intDepth == 0:
         return
 
     for move in moves:
         chess_move(move)
-        print move
         temp = -chess_Negamax(intDepth - 1)
         chess_undo()
 
@@ -593,12 +590,11 @@ def chess_moveNegamax(intDepth, intDuration):
 def chess_Negamax(depth):
     #Negamax function to assist chess_moveNegamax
 
-    moves = chess_movesShuffled()
-
     if depth == 0 or chess_winner() != '?':
         return chess_eval()
 
     score = -999999
+    moves = chess_movesShuffled()
 
     for move in moves:
         chess_move(move)
@@ -609,8 +605,47 @@ def chess_Negamax(depth):
 
 def chess_moveAlphabeta(intDepth, intDuration):
     # perform a alphabeta move and return it - one example output is given below - note that you can call the the other functions in here
+    best = ''
+    alpha = -999999
+    beta = 999999
 
-    return 'c5-c4\n'
+    if intDepth == 0:
+        return
+
+    moves = chess_movesShuffled()
+
+    for move in moves:
+        chess_move(move)
+        temp = -chess_Alphabeta(intDepth - 1, -beta, -alpha)
+        chess_undo()
+
+        if temp > alpha:
+            best = move
+            alpha = temp
+
+    chess_move(best)
+    return best
+    #return 'c5-c4\n'
+
+def chess_Alphabeta(depth, alpha, beta):
+
+    if depth == 0 or chess_winner() != '?':
+        return chess_eval()
+
+    moves = chess_movesShuffled()
+    score = -999999
+
+    for move in moves:
+        chess_move(move)
+        score = max(score, -chess_Alphabeta(depth - 1, -beta, -alpha))
+        chess_undo()
+
+        alpha = max(alpha, score)
+
+        if alpha >= beta:
+            break
+
+    return score
 
 
 def chess_undo():
