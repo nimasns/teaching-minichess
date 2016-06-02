@@ -1,5 +1,5 @@
 import random
-
+import time
 ##########################################################
 
 #board
@@ -18,6 +18,10 @@ mlCounter = -1
 mlFlag = 0
 #p transition to q
 PtoQlog = []
+#timelimit
+timelimit = 0
+timecounter = 0
+timecache = 0
 
 def chess_reset():
     # reset the state of the game / your internal variables - note that this function is highly dependent on your implementation
@@ -38,10 +42,13 @@ def chess_reset():
     mlFlag = 0
     global PtoQlog
     PtoQlog = []
+    global timecounter
+    timecounter = 0
+    global timelimit
+    timelimit = 0
 
 def chess_boardGet():
     # return the state of the game - one example is given below - note that the state has exactly 40 or 41 characters
-
     strOut = ''
 
     strOut += str(turnN)
@@ -77,7 +84,6 @@ def chess_boardSet(strIn):
     turnn, turnC, state[0:5], state[5:10], state[10:15], state[15:20], state[20:25], state[25:30] = list(strIn.split())
     turnN = int(turnn)
 
-
 def chess_winner():
     # determine the winner of the current state of the game and return '?' or '=' or 'W' or 'B' - note that we are returning a character and not a string
 
@@ -89,7 +95,6 @@ def chess_winner():
         return '='
 
     return '?'
-
 
 def chess_isValid(intX, intY):
     if intX < 0:
@@ -106,7 +111,6 @@ def chess_isValid(intX, intY):
 
     return True
 
-
 def chess_isEnemy(strPiece):
     # with reference to the state of the game, return whether the provided argument is a piece from the side not on move - note that we could but should not use the other is() functions in here but probably
 
@@ -117,7 +121,6 @@ def chess_isEnemy(strPiece):
         if strPiece.islower():
             return True
     return False
-
 
 def chess_isOwn(strPiece):
     # with reference to the state of the game, return whether the provided argument is a piece from the side on move - note that we could but should not use the other is() functions in here but probably
@@ -130,14 +133,12 @@ def chess_isOwn(strPiece):
             return True
     return False
 
-
 def chess_isNothing(strPiece):
     # return whether the provided argument is not a piece / is an empty field - note that we could but should not use the other is() functions in here but probably
 
     if strPiece == '.':
         return True
     return False
-
 
 def chess_eval():
     # with reference to the state of the game, return the the evaluation score of the side on move - note that positive means an advantage while negative means a disadvantage
@@ -176,7 +177,6 @@ def chess_eval():
         n += 1
 
     return point
-
 
 def chess_moves():
     # with reference to the state of the game and return the possible moves - one example is given below - note that a move has exactly 6 characters
@@ -421,13 +421,11 @@ def chess_moves():
 
     return strOut
 
-
 def chess_movesShuffled():
     # with reference to the state of the game, determine the possible moves and shuffle them before returning them- note that you can call the chess_moves() function in here
     movelist = chess_moves()
     random.shuffle(movelist)
     return movelist
-
 
 def chess_movesEvaluated():
     # with reference to the state of the game, determine the possible moves and sort them in order of an increasing evaluation score before returning them - note that you can call the chess_moves() function in here
@@ -452,7 +450,6 @@ def chess_movesEvaluated():
         del movelist[index]
 
     return newlist
-
 
 def chess_move(strIn):
     # perform the supplied move (for example 'a5-a4\n') and update the state of the game / your internal variables accordingly - note that it advised to do a sanity check of the supplied move
@@ -551,20 +548,17 @@ def chess_move(strIn):
         mPlog.pop()
         mlCounter -= 1
 
-
 def chess_moveRandom():
     # perform a random move and return it - one example output is given below - note that you can call the chess_movesShuffled() function as well as the chess_move() function in here
     movelist = chess_movesShuffled()
     chess_move(movelist[0])
     return movelist[0]
 
-
 def chess_moveGreedy():
     # perform a greedy move and return it - one example output is given below - note that you can call the chess_movesEvaluated() function as well as the chess_move() function in here
     movelist = chess_movesEvaluated()
     chess_move(movelist[0])
     return movelist[0]
-
 
 def chess_moveNegamax(intDepth, intDuration):
     # perform a negamax move and return it - one example output is given below - note that you can call the the other functions in here
@@ -608,15 +602,25 @@ def chess_moveAlphabeta(intDepth, intDuration):
     best = ''
     alpha = -999999
     beta = 999999
+    global timecounter
+    global timelimit
+    timecounter = 0
+    timelimit = time.time() + 5
+    print "Set Time Limit"
+    print timelimit
 
-    if intDepth == 0:
-        return
+
+    #if intDepth == 0:
+    #    return
 
     moves = chess_movesShuffled()
 
     for move in moves:
         chess_move(move)
-        temp = -chess_Alphabeta(intDepth - 1, -beta, -alpha)
+        #temp = -chess_Alphabeta(intDepth - 1, -beta, -alpha)
+        temp = -chess_Alphabeta(0, -beta, -alpha)
+        print "Next possible MOVE ####"
+        #temp = -chess_Alphabeta(0, -beta, -alpha)
         chess_undo()
 
         if temp > alpha:
@@ -625,11 +629,28 @@ def chess_moveAlphabeta(intDepth, intDuration):
 
     chess_move(best)
     return best
-    #return 'c5-c4\n'
 
+#def chess_Alphabeta(depth, alpha, beta):
 def chess_Alphabeta(depth, alpha, beta):
 
-    if depth == 0 or chess_winner() != '?':
+    global timecounter
+    global timecache
+    timecounter += 1
+    print "Time Counter: "
+    print timecounter
+
+    if timecounter > 10:
+        timecounter = 0
+        print "Timecache has been set"
+        timecache = time.time()
+        print timelimit
+        print timecache
+
+    if timecache > timelimit:
+        return 0
+
+    #if depth == 0 or chess_winner() != '?':
+    if chess_winner() != '?':
         return chess_eval()
 
     moves = chess_movesShuffled()
@@ -637,16 +658,17 @@ def chess_Alphabeta(depth, alpha, beta):
 
     for move in moves:
         chess_move(move)
-        score = max(score, -chess_Alphabeta(depth - 1, -beta, -alpha))
+        #score = max(score, -chess_Alphabeta(depth - 1, -beta, -alpha))
+        score = max(score, -chess_Alphabeta(timecache, -beta, -alpha))
         chess_undo()
 
         alpha = max(alpha, score)
 
-        if alpha >= beta:
+        if alpha >= beta or timecache >= timelimit:
+            print "BREAK TIME &&&&&&&&&&&&&&&&&"
             break
 
     return score
-
 
 def chess_undo():
     # undo the last move and update the state of the game / your internal variables accordingly - note that you need to maintain an internal variable that keeps track of the previous history for this
