@@ -155,13 +155,13 @@ def chess_eval():
         elif state[n] == piece[5].upper():
             point += 1*a
         elif state[n] == piece[4]:
-            point -= 10*a
+            point -= 5*a
         elif state[n] == piece[4].upper():
-            point += 10*a
+            point += 5*a
         elif state[n] == piece[3]:
-            point -= 15*a
+            point -= 10*a
         elif state[n] == piece[3].upper():
-            point += 15*a
+            point += 10*a
         elif state[n] == piece[2]:
             point -= 20*a
         elif state[n] == piece[2].upper():
@@ -171,9 +171,9 @@ def chess_eval():
         elif state[n] == piece[1].upper():
             point += 50*a
         elif state[n] == piece[0]:
-            point -= 500*a
+            point -= 100*a
         elif state[n] == piece[0].upper():
-            point += 500*a
+            point += 100*a
         n += 1
 
     return point
@@ -549,7 +549,7 @@ def chess_move(strIn):
         mlCounter -= 1
 
 def chess_moveRandom():
-    # perform a random move and return it - one example output is given below - note that you can call the chess_movesShuffled() function as well as the chess_move() function in here
+    #perform a random move and return it - one example output is given below - note that you can call the chess_movesShuffled() function as well as the chess_move() function in here
     movelist = chess_movesShuffled()
     chess_move(movelist[0])
     return movelist[0]
@@ -563,16 +563,30 @@ def chess_moveGreedy():
 def chess_moveNegamax(intDepth, intDuration):
     # perform a negamax move and return it - one example output is given below - note that you can call the the other functions in here
     best = ''
-    score = -999999
-    moves = chess_movesShuffled()
+    score = -500
+    global timelimit
+    timelimit = time.time() + 6.2
 
     if intDepth == 0:
         return
 
-    for move in moves:
-        chess_move(move)
-        temp = -chess_Negamax(intDepth - 1)
-        chess_undo()
+    if intDuration <= 3.0:
+        return chess_moveGreedy()
+
+    count = 1
+    while count < 10000:
+        for move in chess_movesShuffled():
+            chess_move(move)
+            temp = -chess_Negamax(count)
+            chess_undo()
+
+            if time.time() >= timelimit:
+                break
+
+        count += 1
+
+        if time.time() >= timelimit:
+            break
 
         if temp > score:
             best = move
@@ -584,13 +598,22 @@ def chess_moveNegamax(intDepth, intDuration):
 def chess_Negamax(depth):
     #Negamax function to assist chess_moveNegamax
 
+    global timecounter
+    global timecache
+    timecounter += 1
+
+    if timecounter > 1000:
+        timecounter = 0
+        timecache = time.time()
+
+    if timecache >= timelimit:
+        return 0
+
     if depth == 0 or chess_winner() != '?':
         return chess_eval()
 
-    score = -999999
-    moves = chess_movesShuffled()
-
-    for move in moves:
+    score = -500
+    for move in chess_movesShuffled():
         chess_move(move)
         score = max(score, -chess_Negamax(depth - 1))
         chess_undo()
@@ -600,72 +623,64 @@ def chess_Negamax(depth):
 def chess_moveAlphabeta(intDepth, intDuration):
     # perform a alphabeta move and return it - one example output is given below - note that you can call the the other functions in here
     best = ''
-    alpha = -999999
-    beta = 999999
-    global timecounter
+    alpha = -500
+    beta = 500
     global timelimit
-    timecounter = 0
-    timelimit = time.time() + 5
-    print "Set Time Limit"
-    print timelimit
+    timelimit = time.time() + 6.2
 
+    if intDepth == 0:
+        return
 
-    #if intDepth == 0:
-    #    return
+    if intDuration <= 3.0:
+        return chess_moveGreedy()
 
-    moves = chess_movesShuffled()
+    count = 1
+    while count < 10000:
+        for move in chess_movesEvaluated():
+            chess_move(move)
+            temp = -chess_Alphabeta(count, -beta, -alpha)
+            chess_undo()
 
-    for move in moves:
-        chess_move(move)
-        #temp = -chess_Alphabeta(intDepth - 1, -beta, -alpha)
-        temp = -chess_Alphabeta(0, -beta, -alpha)
-        print "Next possible MOVE ####"
-        #temp = -chess_Alphabeta(0, -beta, -alpha)
-        chess_undo()
+            if temp > alpha:
+                best = move
+                alpha = temp
 
-        if temp > alpha:
-            best = move
-            alpha = temp
+            if time.time() >= timelimit:
+                break
+
+        count += 1
+
+        if time.time() >= timelimit:
+            break
 
     chess_move(best)
     return best
 
-#def chess_Alphabeta(depth, alpha, beta):
 def chess_Alphabeta(depth, alpha, beta):
 
     global timecounter
     global timecache
     timecounter += 1
-    print "Time Counter: "
-    print timecounter
 
-    if timecounter > 10:
+    if timecounter > 1000:
         timecounter = 0
-        print "Timecache has been set"
         timecache = time.time()
-        print timelimit
-        print timecache
 
-    if timecache > timelimit:
+    if timecache >= timelimit:
         return 0
 
-    #if depth == 0 or chess_winner() != '?':
-    if chess_winner() != '?':
+    if depth == 0 or chess_winner() != '?':
         return chess_eval()
 
-    moves = chess_movesShuffled()
-    score = -999999
-
-    for move in moves:
+    score = -500
+    for move in chess_movesEvaluated():
         chess_move(move)
-        #score = max(score, -chess_Alphabeta(depth - 1, -beta, -alpha))
-        score = max(score, -chess_Alphabeta(timecache, -beta, -alpha))
+        score = max(score, -chess_Alphabeta(depth - 1, -beta, -alpha))
         chess_undo()
 
         alpha = max(alpha, score)
 
-        if alpha >= beta or timecache >= timelimit:
-            print "BREAK TIME &&&&&&&&&&&&&&&&&"
+        if alpha >= beta:
             break
 
     return score
@@ -681,3 +696,4 @@ def chess_undo():
         end = end.strip('\n')
         strOut = end + '-' + start
         chess_move(strOut)
+
